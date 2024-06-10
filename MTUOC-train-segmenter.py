@@ -37,12 +37,14 @@ parser.add_argument("-s", "--segmenter", type=str, help="The pickle file contain
 parser.add_argument("-f", "--corpus_file", type=str, help="The input corpus to train the segmenter with.", required=False)
 parser.add_argument("-d", "--corpus_dir", type=str, help="The input directory containing the files to train the segmenter with.", required=False)
 parser.add_argument("-a", "--abbr_file", type=str, help="The file containing on abbreviation per line to add to the segmenter.", required=False)
+parser.add_argument("-m", "--max_para", type=int, help="The max number of paragraphs to read. After this number, the training is stopped.", required=False)
 
 args = parser.parse_args()
 
 segmenter_file=args.segmenter
 corpus_file=args.corpus_file
 corpus_dir=args.corpus_dir
+max_para=args.max_para
 
 abbr_file=args.abbr_file
 
@@ -58,12 +60,17 @@ if corpus_file:
 if corpus_dir:
     trainer = nltk.tokenize.punkt.PunktTrainer()
     files_in_directory = get_files_in_directory(corpus_dir)
+    contpara=0
     for filename in files_in_directory:
         filepath=os.path.join(corpus_dir,filename)
         print(filepath)
         text = codecs.open(filepath,"r","utf8").read()
         trainer.train(text)
         trainer.freq_threshold()
+        contpara+=len(text.split("\n"))
+        if not max_para==None and contpara>=max_para:
+            break
+        
     trainer.finalize_training()
     segmentador = nltk.tokenize.punkt.PunktSentenceTokenizer(trainer.get_params())
     
