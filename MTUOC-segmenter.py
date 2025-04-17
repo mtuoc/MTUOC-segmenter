@@ -18,6 +18,8 @@
 import argparse
 import sys
 import codecs
+from charset_normalizer import from_path
+
 
 #SRX_SEGMENTER
 import lxml.etree
@@ -133,10 +135,10 @@ def segmenta(cadena):
     resposta="\n".join(resposta)
     return(resposta)
 
+def detect_encoding(file_path):
+    result = from_path(file_path).best()
+    return result.encoding if result else 'utf-8'   
 
-
-def translate(segment):
-    return(segment[::-1])
 
 
 parser = argparse.ArgumentParser(description='A script to segment a text file.')
@@ -166,8 +168,8 @@ if not srxlang in languages:
     print("Available languages:",", ".join(languages))
     sys.exit()
 
-entrada=codecs.open(infile,"r",encoding="utf-8",errors="ignore")
-sortida=codecs.open(outfile,"w",encoding="utf-8")
+encoding = detect_encoding(fullpath)
+entrada = codecs.open(infile, "r", encoding=encoding, errors="ignore")sortida=codecs.open(outfile,"w",encoding="utf-8")
 for linia in entrada:
     segments=segmenta(linia)
     if len(segments)>0:

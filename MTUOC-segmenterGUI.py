@@ -21,6 +21,8 @@ import codecs
 
 from tkinter import *
 from tkinter.ttk import *
+from charset_normalizer import from_path
+
 
 import tkinter 
 from tkinter.filedialog import askopenfilename
@@ -144,10 +146,10 @@ def segmenta(cadena,rules,srxlang):
     resposta="\n".join(resposta)
     return(resposta)
 
+def detect_encoding(file_path):
+    result = from_path(file_path).best()
+    return result.encoding if result else 'utf-8'
 
-
-def translate(segment):
-    return(segment[::-1])
 
 def select_input_file():
     infile = askopenfilename(initialdir = ".",filetypes =(("txt files","*.txt"),("All Files","*.*")),
@@ -185,7 +187,8 @@ def go():
 
     rules = parse(srxfile)
 
-    entrada=codecs.open(infile,"r",encoding="utf-8",errors="ignore")
+    encoding = detect_encoding(fullpath)
+    entrada = codecs.open(infile, "r", encoding=encoding, errors="ignore")
     sortida=codecs.open(outfile,"w",encoding="utf-8")
     for linia in entrada:
         segments=segmenta(linia,rules,srxlang)

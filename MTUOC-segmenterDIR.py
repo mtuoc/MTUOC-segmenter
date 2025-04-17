@@ -19,6 +19,7 @@ import argparse
 import sys
 import codecs
 import os
+from charset_normalizer import from_path
 
 #SRX_SEGMENTER
 import lxml.etree
@@ -134,7 +135,9 @@ def segmenta(cadena):
     resposta="\n".join(resposta)
     return(resposta)
 
-
+def detect_encoding(file_path):
+    result = from_path(file_path).best()
+    return result.encoding if result else 'utf-8'
 
 
 parser = argparse.ArgumentParser(description='A script to segment all the files in one directory and save the segmented files in another directory.')
@@ -171,17 +174,27 @@ paramark=args.paramark
 
 
 files = []
+
 for r, d, f in os.walk(inDir):
     for file in f:
         if file.endswith('.txt'):
-            fullpath=os.path.join(r, file)            
+            fullpath = os.path.join(r, file)
             print(fullpath)
-            entrada=codecs.open(fullpath,"r",encoding="utf-8",errors="ignore")
-            outfile=fullpath.replace(inDir,outDir)
+
+            encoding = detect_encoding(fullpath)
+            entrada = codecs.open(fullpath, "r", encoding=encoding, errors="ignore")
+
+            outfile = fullpath.replace(inDir, outDir)
             print(outfile)
-            sortida=codecs.open(outfile,"w",encoding="utf-8")
+            os.makedirs(os.path.dirname(outfile), exist_ok=True)
+
+            sortida = codecs.open(outfile, "w", encoding="utf-8")
             for linia in entrada:
-                segments=segmenta(linia)
-                if len(segments)>0:
-                    if paramark: sortida.write("<p>\n")
-                    sortida.write(segments+"\n")
+                segments = segmenta(linia)
+                if len(segments) > 0:
+                    if paramark:
+                        sortida.write("<p>\n")
+                    sortida.write(segments + "\n")
+
+            entrada.close()
+            sortida.close()

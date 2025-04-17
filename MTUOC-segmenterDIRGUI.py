@@ -19,6 +19,8 @@ import argparse
 import sys
 import codecs
 import os
+from charset_normalizer import from_path
+
 
 from tkinter import *
 from tkinter.ttk import *
@@ -145,10 +147,9 @@ def segmenta(cadena,rules,srxlang):
     resposta="\n".join(resposta)
     return(resposta)
 
-
-
-def translate(segment):
-    return(segment[::-1])
+def detect_encoding(file_path):
+    result = from_path(file_path).best()
+    return result.encoding if result else 'utf-8'   
 
 def select_input_directory():
     infile = askdirectory(initialdir = ".",title = "Select the input directory.")
@@ -173,6 +174,8 @@ def select_srx_file():
     sorted_languages=sorted(languages)
     CB4['values'] = sorted_languages
 
+ 
+
 def go():
     infile=E1.get()
     outfile=E2.get()
@@ -195,8 +198,9 @@ def go():
     for r, d, f in os.walk(inDir):
         for file in f:
             if file.endswith('.txt'):
-                fullpath=os.path.join(r, file)            
-                entrada=codecs.open(fullpath,"r",encoding="utf-8",errors="ignore")
+                fullpath=os.path.join(r, file)
+                encoding = detect_encoding(fullpath)
+                entrada = codecs.open(fullpath, "r", encoding=encoding, errors="ignore")
                 outfile=fullpath.replace(inDir,outDir)
                 sortida=codecs.open(outfile,"w",encoding="utf-8")
                 for linia in entrada:
