@@ -1,5 +1,5 @@
 #    MTUOC-segmenterGUI
-#    Copyright (C) 2023  Antoni Oliver
+#    Copyright (C) 2025  Antoni Oliver
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ def go():
 
     rules = parse(srxfile)
 
-    encoding = detect_encoding(fullpath)
+    encoding = detect_encoding(infile)
     entrada = codecs.open(infile, "r", encoding=encoding, errors="ignore")
     sortida=codecs.open(outfile,"w",encoding="utf-8")
     for linia in entrada:

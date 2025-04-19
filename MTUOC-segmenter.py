@@ -1,5 +1,5 @@
 #    MTUOC-segmenter
-#    Copyright (C) 2023  Antoni Oliver
+#    Copyright (C) 2025  Antoni Oliver
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -168,8 +168,9 @@ if not srxlang in languages:
     print("Available languages:",", ".join(languages))
     sys.exit()
 
-encoding = detect_encoding(fullpath)
-entrada = codecs.open(infile, "r", encoding=encoding, errors="ignore")sortida=codecs.open(outfile,"w",encoding="utf-8")
+encoding = detect_encoding(infile)
+entrada = codecs.open(infile, "r", encoding=encoding, errors="ignore")
+sortida=codecs.open(outfile,"w",encoding="utf-8")
 for linia in entrada:
     segments=segmenta(linia)
     if len(segments)>0:
